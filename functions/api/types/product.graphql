@@ -1,0 +1,24 @@
+type Product {
+    uid: String!
+    name: String!
+    description: String!
+    categories: [Category!]!
+}
+
+input ProductInput {
+    uid: String
+    name: String!
+    description: String!
+    categories: [CategoryInput!]!
+}
+
+union ProductResult = Product | ProductNotFoundError
+
+type Query { 
+    product(uid: String!): ProductResult!
+    products: [Product]
+}
+
+type Mutation {
+    createProduct(productInput: ProductInput): ProductResult!
+}

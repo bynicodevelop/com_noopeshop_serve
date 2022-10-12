@@ -1,0 +1,11 @@
+enum MediaType {
+    VIDEO,
+    IMAGE,
+}
+
+type Media {
+    uid: String!
+    type: MediaType!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}

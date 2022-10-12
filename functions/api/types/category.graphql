@@ -1,0 +1,23 @@
+type Category {
+    uid: String!
+    name: String!
+    description: String
+}
+
+input CategoryInput {
+    uid: String!
+    name: String
+    description: String
+}
+
+
+union CategoryResult = Category | CategoryNotFoundError
+
+type Query {
+    category(uid: String!): CategoryResult
+    categories: [CategoryResult]
+}
+
+type Mutation {
+    createCategory(name: String!, description: String): CategoryResult!
+}

@@ -1,0 +1,15 @@
+interface BaseError {
+  code: String!
+}
+ 
+type EmailAlreadyExistsError implements BaseError {
+  code: String!
+}
+
+type ProductNotFoundError implements BaseError {
+  code: String!
+}
+
+type CategoryNotFoundError implements BaseError {
+  code: String!
+}
