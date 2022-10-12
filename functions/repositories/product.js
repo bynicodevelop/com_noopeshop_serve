@@ -1,8 +1,8 @@
-const listProducts = async (data, {firestore, error}) => {
+const listProducts = async (data, {firestore}) => {
   try {
-    const snapshot = await firestore.collection('products').get();
+    const {docs} = await firestore.collection('products').get();
 
-    return snapshot.docs.map(async (doc) => {
+    return docs.map(async (doc) => {
       const {categories} = doc.data();
 
       const categoriesResult = await Promise.all(categories
@@ -26,12 +26,11 @@ const listProducts = async (data, {firestore, error}) => {
       };
     });
   } catch (e) {
-    console.log(categoriesResult);
-    error(e);
+    throw new Error(e);
   }
 };
 
-const storeProduct = async ({name, description, categories}, firestore) => {
+const storeProduct = async ({name, description, categories}, {firestore}) => {
   console.log(categories);
 
   const {id: uid} = await firestore

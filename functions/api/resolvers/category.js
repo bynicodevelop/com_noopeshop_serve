@@ -1,8 +1,35 @@
-const {storeCategory} = require('../../repositories/category');
+const {
+  getCategory,
+  listCategories,
+  storeCategory,
+} = require('../../repositories/category');
 
 const categoryQuery = {
-  category: async (parent, args, context, info) => {},
-  categories: async (parent, args, context, info) => {},
+  category: async (parent, args, {firestore}, info) => {
+    const category = await getCategory(args.uid, {
+      firestore,
+    });
+
+    return {
+      __typename: 'Category',
+      ...category,
+    };
+  },
+  categories: async (parent, args, {firestore, error}, info) => {
+    const categories = [];
+
+    try {
+      const categoryResult = await listCategories(args, {firestore});
+
+      for await (const category of categoryResult) {
+        categories.push(category);
+      }
+    } catch (e) {
+      error(e);
+    }
+
+    return [...categories];
+  },
 };
 
 const categoryMutation = {

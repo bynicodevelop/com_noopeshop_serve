@@ -15,7 +15,7 @@ union CategoryResult = Category | CategoryNotFoundError
 
 type Query {
     category(uid: String!): CategoryResult
-    categories: [CategoryResult]
+    categories: [Category]
 }
 
 type Mutation {
