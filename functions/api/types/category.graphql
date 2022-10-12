@@ -1,11 +1,11 @@
 type Category {
-    uid: String!
+    uid: ID!
     name: String!
     description: String
 }
 
 input CategoryInput {
-    uid: String!
+    uid: ID!
     name: String
     description: String
 }
@@ -14,7 +14,7 @@ input CategoryInput {
 union CategoryResult = Category | CategoryNotFoundError
 
 type Query {
-    category(uid: String!): CategoryResult
+    category(uid: ID!): CategoryResult
     categories: [Category]
 }
 

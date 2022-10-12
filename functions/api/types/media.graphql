@@ -4,8 +4,6 @@ enum MediaType {
 }
 
 type Media {
-    uid: String!
     type: MediaType!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    url: String!
 }

@@ -1,12 +1,14 @@
 type Product {
-    uid: String!
+    uid: ID!
+    productId: String!
     name: String!
     description: String!
     categories: [Category!]!
+    media: [Media!]!
 }
 
 input ProductInput {
-    uid: String
+    uid: ID
     name: String!
     description: String!
     categories: [CategoryInput!]!
@@ -15,7 +17,7 @@ input ProductInput {
 union ProductResult = Product | ProductNotFoundError
 
 type Query { 
-    product(uid: String!): ProductResult!
+    product(uid: ID!): ProductResult!
     products: [Product]
 }
 

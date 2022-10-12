@@ -30,12 +30,16 @@ const listProducts = async (data, {firestore}) => {
   }
 };
 
-const storeProduct = async ({name, description, categories}, {firestore}) => {
-  console.log(categories);
-
+const storeProduct = async ({
+  productId,
+  name,
+  description,
+  categories,
+}, {firestore}) => {
   const {id: uid} = await firestore
       .collection('products')
       .add({
+        productId,
         name,
         description,
         categories,
@@ -48,5 +52,23 @@ const storeProduct = async ({name, description, categories}, {firestore}) => {
   };
 };
 
+const addMediaToProduct = async (productUid, medias, {firestore}) => {
+  const mediaRef = await firestore
+      .collection('products')
+      .doc(productUid)
+      .collection('medias');
+
+  await Promise.all(medias.map(async ({hash, filename}, order) =>
+    mediaRef.doc(hash).set({
+      hash,
+      filename,
+      order,
+    })),
+  );
+
+  return medias;
+};
+
 exports.listProducts = listProducts;
 exports.storeProduct = storeProduct;
+exports.addMediaToProduct = addMediaToProduct;
