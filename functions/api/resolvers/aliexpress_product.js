@@ -14,6 +14,8 @@ const {
   getUrlsFromBucket,
 } = require('../../repositories/storage');
 
+const variantPathBucket = (productUid, variantUid, filename) =>
+  `products/${productUid}/variants/${variantUid}/media/${filename}`;
 
 const aliexpressProductMutation = {
   scrapeProduct: async (parent, {
@@ -80,7 +82,7 @@ const aliexpressProductMutation = {
 
         const {uid: variantUid} = variantResult;
 
-        const storagePath = `products/${uid}/media/variants/${variantUid}/${filename}`;
+        const storagePath = variantPathBucket(uid, variantUid, filename);
 
         return {
           storagePath,
@@ -159,6 +161,7 @@ const aliexpressProductMutation = {
         };
       }));
 
+      // TODO: Retourner toutes les informations du produit
       return {
         __typename: 'Product',
         ...{

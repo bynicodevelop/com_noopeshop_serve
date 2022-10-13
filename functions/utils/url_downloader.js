@@ -1,23 +1,13 @@
 const md5 = require('md5');
+const {renameFile} = require('../utils/sanitizer');
 const Downloader = require('nodejs-file-downloader');
-
-const renameFile = (url) => {
-  const filename = url.split('/').pop();
-
-  const hash = md5(url);
-  const ext = filename.substr(filename.lastIndexOf('.'));
-  return {
-    filename: `${md5(url)}${ext}`,
-    hash,
-  };
-};
 
 const optionsFactory = (urls) => urls.map((file) => {
   const {url} = file;
 
   return {
     ...file,
-    ...renameFile(url),
+    ...renameFile(url, md5),
   };
 });
 
