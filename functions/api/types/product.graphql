@@ -5,6 +5,7 @@ type Product {
     description: String!
     categories: [Category!]!
     media: [Media!]!
+    variants: [Variant!]!
 }
 
 input ProductInput {

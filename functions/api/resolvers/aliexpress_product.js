@@ -1,43 +1,19 @@
+const _ = require('lodash');
 const {scraper} = require('../../utils/aliexpress_scraper');
-const {storeProduct, addMediaToProduct} = require('../../repositories/product');
-const download = require('image-downloader');
-const md5 = require('md5');
+const {urlDownloader} = require('../../utils/url_downloader');
+
+const {
+  storeProduct,
+  addMediaToProduct,
+  addVariantsToProduct,
+  addMediaToVariant,
+} = require('../../repositories/product');
+
 const {
   uploadToBucket,
   getUrlsFromBucket,
 } = require('../../repositories/storage');
 
-const renameFile = (url) => {
-  const filename = url.split('/').pop();
-
-  const hash = md5(url);
-  const ext = filename.substr(filename.lastIndexOf('.'));
-  return {
-    filename: `${md5(url)}${ext}`,
-    hash,
-  };
-};
-
-const imageDownloader = async (images, tmpDirectory = '/tmp') => {
-  const options = images.map((url) => ({
-    url,
-    ...renameFile(url),
-  }));
-
-  return Promise.all(options.map(async ({url, filename, hash}) => {
-    const fileUploaded = await download.image({
-      url,
-      dest: `${tmpDirectory.replace(/\/$/, '')}/${filename}`,
-    });
-
-    return {
-      path: fileUploaded.filename,
-      filename,
-      hash,
-    };
-  }),
-  );
-};
 
 const aliexpressProductMutation = {
   scrapeProduct: async (parent, {
@@ -55,6 +31,7 @@ const aliexpressProductMutation = {
       description,
       productId,
       images,
+      variants,
     } = await scraper(productIdInput);
 
     try {
@@ -72,10 +49,72 @@ const aliexpressProductMutation = {
 
       const {uid} = productResult;
 
+      const {variantValues} = variants;
+
+      /**
+       * Ajout de variants au produit
+       */
+      const variantsResult = await addVariantsToProduct(
+          uid,
+          variantValues, {
+            firestore,
+          },
+      );
+
+      const variantsImageUrl = variantValues.map((variant) => {
+        const {sku, image} = variant;
+        return {
+          sku,
+          url: image,
+        };
+      });
+
+      const variantsImageUrlDownladed = await urlDownloader(
+          variantsImageUrl,
+      );
+
+      const variantsMerged = variantsImageUrlDownladed.map((variant) => {
+        const {sku, filename} = variant;
+
+        const variantResult = _.find(variantsResult, {sku});
+
+        const {uid: variantUid} = variantResult;
+
+        const storagePath = `products/${uid}/media/variants/${variantUid}/${filename}`;
+
+        return {
+          storagePath,
+          ...variant,
+          ...variantResult,
+        };
+      });
+
+      /**
+       * Envoie les images dans le bucket
+       */
+      const variantMediaUploaded = await Promise.all(variantsMerged.map(
+          async (media) => uploadToBucket(
+              media,
+              storage,
+          ),
+      ));
+
+      await Promise.all(variantMediaUploaded.map(async (variant) => {
+        await addMediaToVariant(uid, variant, {firestore});
+      }));
+
+      /**
+       * =======================================
+       * Media du produit
+       * =======================================
+       */
+
       /**
        * Télécharger les images dans un dossier temporaire
        */
-      const imagesDownloaded = await imageDownloader(images);
+      const imagesDownloaded = await urlDownloader(
+          images,
+      );
 
       /**
        * Permet de compléter les informations des images,

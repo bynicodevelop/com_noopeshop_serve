@@ -1,6 +1,8 @@
 const scrape = require('aliexpress-product-scraper');
 const {NodeHtmlMarkdown} = require('node-html-markdown');
 
+const {lowerCase} = require('lodash');
+
 const extractVariants = ({variants: {options, prices}}) => {
   const {name: variantName, values} = options[0];
 
@@ -20,8 +22,8 @@ const extractVariants = ({variants: {options, prices}}) => {
 
       return {
         sku,
-        name,
-        displayName,
+        name: lowerCase(name),
+        displayName: lowerCase(displayName),
         image,
         price: {
           price,
@@ -54,7 +56,7 @@ const extractProduct = async ({
   return {
     title,
     productId,
-    images,
+    images: images.map((image) => ({url: image})),
     description: markdown,
   };
 };

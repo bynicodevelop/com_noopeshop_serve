@@ -69,6 +69,70 @@ const addMediaToProduct = async (productUid, medias, {firestore}) => {
   return medias;
 };
 
+// TODO: Add price to variant
+const addVariantToProduct = async (productUid, {
+  sku,
+  name,
+  displayName,
+}, {firestore}) => {
+  const data = {
+    sku,
+    name,
+    displayName,
+  };
+
+  const {id: uid} = await firestore
+      .collection('products')
+      .doc(productUid)
+      .collection('variants')
+      .add(data);
+
+  return {
+    uid,
+    ...data,
+  };
+};
+
+const addVariantsToProduct = async (productUid, variants, {firestore}) => {
+  const variantsResult = await Promise.all(variants.map(async (variant) =>
+    addVariantToProduct(
+        productUid,
+        variant,
+        {
+          firestore,
+        },
+    )),
+  );
+
+  return variantsResult;
+};
+
+const addMediaToVariant = async (productUid, variant, {firestore}) => {
+  const {uid, filename, hash} = variant;
+
+  await firestore
+      .collection('products')
+      .doc(productUid)
+      .collection('variants')
+      .doc(uid)
+      .update({
+        media: {
+          filename,
+          hash,
+        },
+      });
+
+  return {
+    uid,
+    media: {
+      filename,
+      hash,
+    },
+  };
+};
+
 exports.listProducts = listProducts;
 exports.storeProduct = storeProduct;
 exports.addMediaToProduct = addMediaToProduct;
+exports.addVariantsToProduct = addVariantsToProduct;
+exports.addMediaToVariant = addMediaToVariant;
