@@ -19,7 +19,7 @@ union ProductResult = Product | ProductNotFoundError
 
 type Query { 
     product(uid: ID!): ProductResult!
-    products: [Product]
+    products: [Product],
 }
 
 type Mutation {

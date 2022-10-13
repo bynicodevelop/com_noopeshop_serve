@@ -1,3 +1,20 @@
+const getCategoriesFromProduct = async (uid, {firestore}) => {
+  const {docs} = await firestore
+      .collection('products')
+      .doc(uid)
+      .collection('categories')
+      .get();
+
+  if (docs.length === 0) {
+    return [];
+  }
+
+  return docs.map((doc) => ({
+    uid: doc.id,
+    ...doc.data(),
+  }));
+};
+
 const getCategory = async (uid, {firestore}) => {
   try {
     const doc = await firestore.collection('categories').doc(uid).get();
@@ -44,6 +61,7 @@ const storeCategory = async ({name, description}, firestore) => {
   };
 };
 
+exports.getCategoriesFromProduct = getCategoriesFromProduct;
 exports.getCategory = getCategory;
 exports.listCategories = listCategories;
 exports.storeCategory = storeCategory;

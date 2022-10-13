@@ -13,7 +13,7 @@ input CategoryInput {
 
 union CategoryResult = Category | CategoryNotFoundError
 
-type Query {
+type Category {
     category(uid: ID!): CategoryResult
     categories: [Category]
 }
