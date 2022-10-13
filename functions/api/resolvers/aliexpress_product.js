@@ -82,7 +82,11 @@ const aliexpressProductMutation = {
 
         const {uid: variantUid} = variantResult;
 
-        const storagePath = variantPathBucket(uid, variantUid, filename);
+        const storagePath = variantPathBucket(
+            uid,
+            variantUid,
+            filename,
+        );
 
         return {
           storagePath,
