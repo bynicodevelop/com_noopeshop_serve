@@ -1,13 +1,13 @@
 const listProducts = async (data, {firestore}) => {
   try {
-    const {docs} = await firestore.collection('products').get();
+    const {docs} = await firestore().collection('products').get();
 
     return docs.map(async (doc) => {
       const {categories} = doc.data();
 
       const categoriesResult = await Promise.all(categories
           .map(async ({uid}) => {
-            const categoryRef = await firestore
+            const categoryRef = await firestore()
                 .collection('categories')
                 .doc(uid)
                 .get();
@@ -36,7 +36,7 @@ const storeProduct = async ({
   description,
   categories,
 }, {firestore}) => {
-  const {id: uid} = await firestore
+  const {id: uid} = await firestore()
       .collection('products')
       .add({
         productId,
@@ -52,8 +52,37 @@ const storeProduct = async ({
   };
 };
 
+const updateProduct = async ({
+  uid,
+  name,
+  description,
+  categories,
+}, {firestore}) => {
+  const productRef = await firestore()
+      .collection('products')
+      .doc(uid);
+
+  const data = {
+    name,
+    description,
+  };
+
+  if (categories.length > 0) {
+    data[categories] = firestore.FieldValue.arrayUnion(...categories);
+  }
+
+  await productRef.update(data);
+
+  return {
+    uid,
+    name,
+    description,
+    categories,
+  };
+};
+
 const addMediaToProduct = async (productUid, medias, {firestore}) => {
-  const mediaRef = await firestore
+  const mediaRef = await firestore()
       .collection('products')
       .doc(productUid)
       .collection('medias');
@@ -81,7 +110,7 @@ const addVariantToProduct = async (productUid, {
     displayName,
   };
 
-  const {id: uid} = await firestore
+  const {id: uid} = await firestore()
       .collection('products')
       .doc(productUid)
       .collection('variants')
@@ -110,7 +139,7 @@ const addVariantsToProduct = async (productUid, variants, {firestore}) => {
 const addMediaToVariant = async (productUid, variant, {firestore}) => {
   const {uid, filename, hash} = variant;
 
-  await firestore
+  await firestore()
       .collection('products')
       .doc(productUid)
       .collection('variants')
@@ -133,6 +162,7 @@ const addMediaToVariant = async (productUid, variant, {firestore}) => {
 
 exports.listProducts = listProducts;
 exports.storeProduct = storeProduct;
+exports.updateProduct = updateProduct;
 exports.addMediaToProduct = addMediaToProduct;
 exports.addVariantsToProduct = addVariantsToProduct;
 exports.addMediaToVariant = addMediaToVariant;

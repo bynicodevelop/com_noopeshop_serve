@@ -12,7 +12,7 @@ input ProductInput {
     uid: ID
     name: String!
     description: String!
-    categories: [CategoryInput!]!
+    categories: [CategoryInput]!
 }
 
 union ProductResult = Product | ProductNotFoundError
@@ -24,4 +24,5 @@ type Query {
 
 type Mutation {
     createProduct(productInput: ProductInput): ProductResult!
+    updateProduct(productInput: ProductInput): ProductResult!
 }

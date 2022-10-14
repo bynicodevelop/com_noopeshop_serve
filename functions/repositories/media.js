@@ -1,5 +1,5 @@
 const getMediaFromProduct = async (productUid, {firestore}) => {
-  const {docs} = await firestore
+  const {docs} = await firestore()
       .collection('products')
       .doc(productUid)
       .collection('medias')

@@ -9,7 +9,7 @@ const resolvers = require('./resolvers');
 const {logger} = require('../utils/logger');
 
 const app = express();
-const firestore = admin.firestore();
+const firestore = admin.firestore;
 const storage = admin.storage();
 
 const typesArray = loadFilesSync(join(__dirname, './types'));
