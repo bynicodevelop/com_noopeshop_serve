@@ -21,10 +21,10 @@ const resolvers = {
   Query: {
     ...userQuery,
     ...productQuery,
+    ...categoryQuery,
   },
   Product: {
     ...mediaQuery,
-    ...categoryQuery,
   },
   Mutation: {
     ...userMutation,

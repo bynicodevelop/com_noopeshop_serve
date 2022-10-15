@@ -5,19 +5,19 @@ type Category {
 }
 
 input CategoryInput {
-    uid: ID!
-    name: String
+    uid: ID
+    name: String!
     description: String
 }
 
-
 union CategoryResult = Category | CategoryNotFoundError
 
-type Category {
+type Query {
     category(uid: ID!): CategoryResult
     categories: [Category]
 }
 
 type Mutation {
-    createCategory(name: String!, description: String): CategoryResult!
+    createCategory(categoryInput: CategoryInput!): CategoryResult!
+    updateCategory(categoryInput: CategoryInput!): CategoryResult!
 }
