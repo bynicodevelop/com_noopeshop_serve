@@ -1,11 +1,10 @@
-enum MediaType {
-    VIDEO,
-    IMAGE,
+type Media {
+    uid: ID!
+    filename: String!
+    hash: String!
+    order: Int!
 }
 
 type Media {
-    uid: String!
-    type: MediaType!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    media(uid: ID): Media!
 }

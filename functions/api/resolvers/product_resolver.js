@@ -1,4 +1,8 @@
-const {listProducts, storeProduct} = require('../../repositories/product');
+const {
+  listProducts,
+  storeProduct,
+  updateProduct,
+} = require('../../repositories/product');
 
 const productQuery = {
   products: async (parent, args, {firestore, error}, info) => {
@@ -20,8 +24,13 @@ const productQuery = {
 
 const productMutation = {
   createProduct: async (
-      parent,
-      {productInput: {name, description, categories}},
+      parent, {
+        productInput: {
+          name,
+          description,
+          categories,
+        },
+      },
       {firestore},
   ) => {
     const result = await storeProduct({
@@ -29,6 +38,33 @@ const productMutation = {
       description,
       categories,
     }, {firestore});
+
+    return {
+      __typename: 'Product',
+      ...result,
+    };
+  },
+
+  updateProduct: async (
+      parent, {
+        productInput: {
+          uid,
+          name,
+          description,
+          categories,
+        },
+      },
+      {firestore},
+  ) => {
+    const result = await updateProduct(
+        {
+          uid,
+          name,
+          description,
+          categories,
+        },
+        {firestore},
+    );
 
     return {
       __typename: 'Product',

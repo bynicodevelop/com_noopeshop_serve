@@ -1,6 +1,23 @@
+const getCategoriesFromProduct = async (uid, {firestore}) => {
+  const {docs} = await firestore()
+      .collection('products')
+      .doc(uid)
+      .collection('categories')
+      .get();
+
+  if (docs.length === 0) {
+    return [];
+  }
+
+  return docs.map((doc) => ({
+    uid: doc.id,
+    ...doc.data(),
+  }));
+};
+
 const getCategory = async (uid, {firestore}) => {
   try {
-    const doc = await firestore.collection('categories').doc(uid).get();
+    const doc = await firestore().collection('categories').doc(uid).get();
 
     return {
       uid: doc.id,
@@ -14,7 +31,7 @@ const getCategory = async (uid, {firestore}) => {
 
 const listCategories = async (data, {firestore}) => {
   try {
-    const {docs} = await firestore.collection('categories').get();
+    const {docs} = await firestore().collection('categories').get();
 
     return docs.map((doc) => ({
       uid: doc.id,
@@ -25,10 +42,10 @@ const listCategories = async (data, {firestore}) => {
   }
 };
 
-const storeCategory = async ({name, description}, firestore) => {
-  const now = new Date();
+const storeCategory = async ({name, description}, {firestore}) => {
+  const now = firestore.FieldValue.serverTimestamp();
 
-  const {id: uid} = await firestore
+  const {id: uid} = await firestore()
       .collection('categories')
       .add({
         name,
@@ -44,7 +61,26 @@ const storeCategory = async ({name, description}, firestore) => {
   };
 };
 
+const updateCategory = async ({uid, name, description}, {firestore}) => {
+  await firestore()
+      .collection('categories')
+      .doc(uid)
+      .update({
+        name,
+        description,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      });
+
+  return {
+    uid,
+    name,
+    description,
+  };
+};
+
+
+exports.getCategoriesFromProduct = getCategoriesFromProduct;
 exports.getCategory = getCategory;
 exports.listCategories = listCategories;
 exports.storeCategory = storeCategory;
-
+exports.updateCategory = updateCategory;

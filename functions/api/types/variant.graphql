@@ -1,0 +1,6 @@
+type Variant {
+    sku: ID!
+    name: String!
+    displayName: String!
+    image: Media!
+}
